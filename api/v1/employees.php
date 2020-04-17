@@ -17,6 +17,14 @@ switch ($request_method) {
     case 'POST':
         insert_employee();
         break;
+    case 'PUT':
+        $id = intval($_GET["id"]);
+        update_employee($id);
+        break;
+    case 'DELETE':
+        $id = intval($_GET["id"]);
+        delete_employee($id);
+        break;
     default:
     header("http/1.0 405 Method Not Allowed");
     break;
@@ -77,5 +85,47 @@ function get_employeesid($id=0){
     echo json_encode($response);
 
  }
+function update_employee($id){
+    global $connection;
+    $data = json_decode(file_get_contents('php://input'),TRUE);
+    $name = $data["employee_name"];
+    $salary = $data["employee_salary"];
+    $ege = $data["employee_ege"];
+    echo $query = "UPDATE `tb_employee` SET 
+    `employee_name` = '$name',
+    `employee_salary` = '$salary',
+    `employee_ege` = '$ege'
+    WHERE `id` = '$id'";
+    if (mysqli_query($connection,$query)) {
+        $response = array(
+            'status'=>1,
+            'status_massage' =>'Employee Update Successfully'
+        );
+    }else {
+        $response = array(
+            'status'=>0,
+            'status_massage' =>'Employee Update failed'
+        );
+    }
+    header('Content_Type: application/json');
+    echo json_encode($response);
+ }
+function delete_employee($id){
+    global $connection;
+    $query = "DELETE FROM `tb_employee` WHERE `id` = '$id'";
+    if (mysqli_query($connection,$query)) {
+        $response = array(
+            'status'=>1,
+            'status_massage' =>'Employee Delete Successfully'
+        );
+    }else {
+        $response = array(
+            'status'=>0,
+            'status_massage' =>'Employee Delete failed'
+        );
+    }
+    header('Content_Type: application/json');
+    echo json_encode($response);
+}
 
 ?>
